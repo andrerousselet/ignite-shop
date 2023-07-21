@@ -2,9 +2,7 @@ import { useRouter } from "next/router";
 import { styled } from "../../styles";
 
 const Button = styled("button", {
-  backgroundColor: "$rocketseat",
-  borderRadius: 6,
-  border: 0,
+  backgroundColor: "$green300",
   padding: 10,
 });
 
