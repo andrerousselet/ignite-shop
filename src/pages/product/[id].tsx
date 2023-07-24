@@ -1,27 +1,73 @@
-import { useRouter } from "next/router";
-import { styled } from "../../styles";
 import {
   ImageContainer,
   ProductContainer,
   ProductDetails,
 } from "../../styles/pages/product";
+import { GetStaticPaths, GetStaticProps } from "next";
+import Image from "next/image";
+import { stripe } from "../../lib/stripe";
+import Stripe from "stripe";
+import { formatPrice } from "../../utils/formatPrice";
+import { useRouter } from "next/router";
 
-export default function Product() {
-  const { query } = useRouter();
+interface ProductProps {
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    price: string;
+    imageUrl: string;
+  };
+}
+
+export default function Product({ product }: ProductProps) {
+  const { isFallback } = useRouter();
+
+  if (isFallback) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <ProductContainer>
-      <ImageContainer></ImageContainer>
+      <ImageContainer>
+        <Image src={product.imageUrl} width={520} height={480} alt="" />
+      </ImageContainer>
       <ProductDetails>
-        <h1>Camiseta X</h1>
-        <span>R$ 79,90</span>
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta nulla
-          hic magnam, neque vero quia nisi fugiat. Nihil quasi ut earum! Nisi
-          officia pariatur eos aspernatur quas sed ex quis!
-        </p>
+        <h1>{product.name}</h1>
+        <span>{product.price}</span>
+        <p>{product.description}</p>
         <button>Comprar agora</button>
       </ProductDetails>
     </ProductContainer>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [{ params: { id: "prod_OJ16emwyfIxFli" } }],
+    fallback: true,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const productId = String(params.id);
+
+  const product = await stripe.products.retrieve(productId, {
+    expand: ["default_price"],
+  });
+
+  const price = product.default_price as Stripe.Price;
+
+  return {
+    props: {
+      product: {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: formatPrice(price.unit_amount / 100),
+        imageUrl: product.images[0],
+      },
+    },
+    revalidate: 60 * 60 * 2, // every 2 hours
+  };
+};
