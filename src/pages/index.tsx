@@ -6,6 +6,7 @@ import { useKeenSlider } from "keen-slider/react";
 
 import "keen-slider/keen-slider.min.css";
 import Stripe from "stripe";
+import { formatPrice } from "../utils/formatPrice";
 
 interface HomeProps {
   products: {
@@ -34,7 +35,7 @@ export default function Home({ products }: HomeProps) {
             <Image src={imageUrl} alt="" width={520} height={480} />
             <footer>
               <strong>{name}</strong>
-              <span>{price}</span>
+              <span>{formatPrice(price)}</span>
             </footer>
           </Product>
         );
