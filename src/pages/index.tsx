@@ -35,7 +35,7 @@ export default function Home({ products }: HomeProps) {
             <Image src={imageUrl} alt="" width={520} height={480} />
             <footer>
               <strong>{name}</strong>
-              <span>{formatPrice(price)}</span>
+              <span>{price}</span>
             </footer>
           </Product>
         );
@@ -55,7 +55,7 @@ export const getStaticProps: GetStaticProps = async () => {
       id: product.id,
       name: product.name,
       description: product.description,
-      price: price.unit_amount / 100,
+      price: formatPrice(price.unit_amount / 100),
       imageUrl: product.images[0],
     };
   });
