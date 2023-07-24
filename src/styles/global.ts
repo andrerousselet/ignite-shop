@@ -22,4 +22,9 @@ export const globalStyles = globalCss({
     borderRadius: 6,
     cursor: "pointer",
   },
+
+  a: {
+    color: "inherit",
+    textDecoration: "none",
+  },
 });
